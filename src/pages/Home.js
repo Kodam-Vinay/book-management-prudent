@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import {
   Box,
   TextField,
@@ -10,8 +10,9 @@ import {
 import SearchContext from "../context/SearchContext";
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
-import { ALL_NAVIGATION_LINKS } from "../utils/constants";
+import { ALL_NAVIGATION_LINKS, API_STATUS_LIST } from "../utils/constants";
 import { ReusableButton } from "../utils/utilConstants";
+import useGetData from "../hooks/useGetData";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -26,26 +27,32 @@ const Home = () => {
     setSelectedGenre,
   } = useContext(SearchContext);
 
+  const [data, setData] = useState({
+    authors: [],
+    genres: [],
+  });
+
+  const [apiStatus, setApiStatus] = useState(API_STATUS_LIST.initial);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useGetData({
+    setApiStatus,
+    setData: (data) =>
+      setData({
+        authors: data?.authors,
+        genres: data?.genres,
+      }),
+    setErrorMessage,
+    isQuery: false,
+  });
+
   const query = `?search_q=${searchQuery}&genre=${selectedGenre}&author=${selectedAuthor}`;
   const onSubmitSearch = (e) => {
     e.preventDefault();
     setSearchClicked(true);
     navigate(`${ALL_NAVIGATION_LINKS.searchResults.path}${query}`);
   };
-
-  const [genres, setGenres] = useState([]);
-  const [authors, setAuthors] = useState([]);
-
-  useEffect(() => {
-    // Fetch genres and authors (replace with actual API calls or context/state logic)
-    setGenres(["Fantasy", "Science Fiction", "Mystery", "Non-fiction"]);
-    setAuthors([
-      "J.K. Rowling",
-      "Isaac Asimov",
-      "Agatha Christie",
-      "Malcolm Gladwell",
-    ]);
-  }, []);
 
   return (
     <Box
@@ -98,7 +105,7 @@ const Home = () => {
             width: "100%",
           }}
         >
-          {genres.map((genre) => (
+          {data?.genres?.map((genre) => (
             <MenuItem key={genre} value={genre}>
               {genre}
             </MenuItem>
@@ -116,7 +123,7 @@ const Home = () => {
             width: "100%",
           }}
         >
-          {authors.map((author) => (
+          {data?.authors?.map((author) => (
             <MenuItem key={author} value={author}>
               {author}
             </MenuItem>

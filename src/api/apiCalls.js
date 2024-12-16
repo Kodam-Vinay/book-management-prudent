@@ -9,7 +9,7 @@ export const getRequest = async ({
 }) => {
   try {
     const res = await fetch(
-      `${API_URL}${isQuery ? "?" + searchQuery : "/" + bookId}`
+      `${API_URL}${isQuery ? "?" + searchQuery : "/filter-list"}`
     );
     const data = await res.json();
     if (res.ok) {

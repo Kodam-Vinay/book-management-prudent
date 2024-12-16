@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { API_STATUS_LIST } from "../utils/constants";
-import useGetBooksData from "../hooks/useGetBooksData";
+import useGetData from "../hooks/useGetData";
 import { Box } from "@mui/material";
 import {
   renderError,
@@ -17,10 +17,11 @@ const SearchResults = () => {
   const [booksData, setBooksData] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
-  useGetBooksData({
+  useGetData({
     setApiStatus,
     setData: (data) => setBooksData(data?.books),
     setErrorMessage,
+    isQuery: true,
   });
 
   const handleDeleteBook = async (bookId) => {

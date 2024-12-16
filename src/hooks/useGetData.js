@@ -3,7 +3,12 @@ import { getRequest } from "../api/apiCalls";
 import SearchContext from "../context/SearchContext";
 import { useSearchParams } from "react-router-dom";
 
-const useGetBooksData = ({ setData, setApiStatus, setErrorMessage }) => {
+const useGetData = ({
+  setData,
+  setApiStatus,
+  setErrorMessage,
+  isQuery = true,
+}) => {
   const { isSearchClicked } = useContext(SearchContext);
   const [searchParams] = useSearchParams();
 
@@ -26,12 +31,13 @@ const useGetBooksData = ({ setData, setApiStatus, setErrorMessage }) => {
       setApiStatus,
       setErrorMessage,
       searchQuery: query,
-      isQuery: true,
+      isQuery,
     });
+
     if (res?.status) {
       setData(res.data);
     }
   }
 };
 
-export default useGetBooksData;
+export default useGetData;
