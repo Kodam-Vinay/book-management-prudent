@@ -9,7 +9,10 @@ const MobileNavigationLinks = ({ handleAddBook }) => {
 
   const styles = {
     container: {
-      display: "flex",
+      display: {
+        vxs: "flex",
+        sm: "none",
+      },
       flexDirection: "column",
       position: "fixed",
       top: 0,
