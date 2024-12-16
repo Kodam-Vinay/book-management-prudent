@@ -11,6 +11,7 @@ export const BookProvider = ({ children }) => {
     PublishedDate: "",
     AuthorID: "",
     GenreID: "",
+    GenreDescription: "",
   });
 
   return (

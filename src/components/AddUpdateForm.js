@@ -1,16 +1,14 @@
-import { Box, MenuItem, TextField } from "@mui/material";
+import { Box, List, ListItemButton, MenuItem, TextField } from "@mui/material";
 import { useContext, useState } from "react";
 import { ReusableButton, validateForm } from "../utils/utilConstants";
 import BookContext from "../context/BookContext";
 import PopupContext from "../context/PopupContext";
 import useGetData from "../hooks/useGetData";
 import { API_STATUS_LIST } from "../utils/constants";
-import SearchContext from "../context/SearchContext";
 
 const AddUpdateForm = ({ handleSaveDetails }) => {
   const { bookDetails, setBookDetails } = useContext(BookContext);
   const { togglePopupOpen } = useContext(PopupContext);
-  const { setSelectedAuthor, setSelectedGenre } = useContext(SearchContext);
 
   const [apiStatus, setApiStatus] = useState(API_STATUS_LIST.initial);
   const [errorMessage, setErrorMessage] = useState("");
@@ -40,6 +38,11 @@ const AddUpdateForm = ({ handleSaveDetails }) => {
     }
 
     setErrors((prev) => ({ ...prev, [name]: error }));
+    setBookDetails((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectOption = (name, value) => {
+    console.log(name, value);
     setBookDetails((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -80,44 +83,100 @@ const AddUpdateForm = ({ handleSaveDetails }) => {
         error={!!errors.Title}
         helperText={errors.Title}
       />
-      <TextField
-        select
-        label="Genre"
-        value={bookDetails?.GenreName}
-        onChange={(e) => handleChange("GenreName", e.target.value)}
-        fullWidth
-        variant="outlined"
+
+      <Box
         sx={{
-          width: "100%",
+          position: "relative",
         }}
-        error={!!errors.GenreName}
-        helperText={errors.GenreName}
       >
-        {data?.genres?.map((genre) => (
-          <MenuItem key={genre} value={genre}>
-            {genre}
-          </MenuItem>
-        ))}
-      </TextField>
-      <TextField
-        select
-        label="Author"
-        value={bookDetails?.AuthorName}
-        onChange={(e) => handleChange("AuthorName", e.target.value)}
-        fullWidth
-        variant="outlined"
+        <TextField
+          variant="outlined"
+          value={bookDetails?.GenreName}
+          onChange={(e) => handleChange("GenreName", e.target.value)}
+          fullWidth
+          placeholder="Genre Name"
+          error={!!errors.GenreName}
+          helperText={errors.GenreName}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            background: "gray",
+            width: "100%",
+            borderRadius: 2,
+            zIndex: 10,
+          }}
+        >
+          {!bookDetails?.GenreName &&
+            data?.genres?.map((genre) => (
+              <MenuItem
+                key={genre}
+                value={genre}
+                sx={{
+                  ":hover": {
+                    opacity: 0.9,
+                  },
+                  cursor: "pointer",
+                }}
+                onClick={() => handleSelectOption("GenreName", genre)}
+              >
+                {genre}
+              </MenuItem>
+            ))}
+        </Box>
+      </Box>
+
+      <Box
         sx={{
-          width: "100%",
+          position: "relative",
+          mt: 1,
         }}
-        error={!!errors.AuthorName}
-        helperText={errors.AuthorName}
       >
-        {data?.authors?.map((author) => (
-          <MenuItem key={author} value={author}>
-            {author}
-          </MenuItem>
-        ))}
-      </TextField>
+        <TextField
+          variant="outlined"
+          value={bookDetails?.AuthorName}
+          onChange={(e) => handleChange("AuthorName", e.target.value)}
+          fullWidth
+          placeholder="Author Name"
+          error={!!errors.AuthorName}
+          helperText={errors.AuthorName}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            background: "gray",
+            width: "100%",
+            borderRadius: 2,
+            zIndex: 10,
+          }}
+        >
+          {!bookDetails?.AuthorName &&
+            data?.authors?.map((author) => (
+              <MenuItem
+                key={author}
+                value={author}
+                sx={{
+                  ":hover": {
+                    opacity: 0.9,
+                  },
+                  cursor: "pointer",
+                }}
+                onClick={() => handleSelectOption("AuthorName", author)}
+              >
+                {author}
+              </MenuItem>
+            ))}
+        </Box>
+      </Box>
+
+      <TextField
+        variant="outlined"
+        value={bookDetails?.GenreDescription}
+        onChange={(e) => handleChange("GenreDescription", e.target.value)}
+        fullWidth
+        placeholder="Genre Description"
+      />
+
       <TextField
         variant="outlined"
         value={bookDetails?.Pages}
@@ -127,6 +186,7 @@ const AddUpdateForm = ({ handleSaveDetails }) => {
         error={!!errors.Pages}
         helperText={errors.Pages}
       />
+
       <TextField
         variant="outlined"
         type="date"

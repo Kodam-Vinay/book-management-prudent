@@ -74,13 +74,7 @@ const BookDetails = () => {
   const updateBookFun = async (updatedBookData) => {
     const res = await putRequest({
       bookId: updatedBookData?.BookID,
-      requestData: {
-        Title: updatedBookData?.Title,
-        Pages: updatedBookData?.Pages,
-        PublishedDate: updatedBookData?.PublishedDate,
-        AuthorID: updatedBookData?.AuthorID,
-        GenreID: updatedBookData?.GenreID,
-      },
+      requestData: updatedBookData,
       setApiStatus,
       setErrorMessage,
     });
