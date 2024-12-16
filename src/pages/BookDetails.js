@@ -20,15 +20,14 @@ const BookDetails = () => {
   const [apiStatus, setApiStatus] = useState(API_STATUS_LIST.initial);
   const [errorMessage, setErrorMessage] = useState("");
   const { state } = useLocation();
-  const { bookData: bookDetails } = state;
+  const { bookData } = state;
   const { togglePopupOpen, setPopupType, setContent } =
     useContext(PopupContext);
-  const { setBookDetails, bookDetails: updatedBookData } =
-    useContext(BookContext);
+  const { setBookDetails } = useContext(BookContext);
 
-  const deleteBookFn = async () => {
+  const deleteBookFn = async (bookId) => {
     const res = await deleteRequest({
-      bookId: bookDetails?.BookID,
+      bookId,
       setApiStatus,
       setErrorMessage,
     });
@@ -39,7 +38,7 @@ const BookDetails = () => {
     }
   };
 
-  const handleDeleteBook = () => {
+  const handleDeleteBook = (bookId) => {
     togglePopupOpen(true);
     setPopupType(ALL_POPUP_TYPES.confirmation);
     setContent({
@@ -58,7 +57,7 @@ const BookDetails = () => {
             applyStyles={{
               backgroundColor: "green",
             }}
-            handleClickButton={() => deleteBookFn()}
+            handleClickButton={() => deleteBookFn(bookId)}
           />
           <ReusableButton
             children={<span>Cancel</span>}
@@ -72,27 +71,39 @@ const BookDetails = () => {
     });
   };
 
-  const updateBookFun = async () => {
+  const updateBookFun = async (updatedBookData) => {
     const res = await putRequest({
-      bookId: bookDetails?.BookID,
-      requestData: updatedBookData,
+      bookId: updatedBookData?.BookID,
+      requestData: {
+        Title: updatedBookData?.Title,
+        Pages: updatedBookData?.Pages,
+        PublishedDate: updatedBookData?.PublishedDate,
+        AuthorID: updatedBookData?.AuthorID,
+        GenreID: updatedBookData?.GenreID,
+      },
       setApiStatus,
       setErrorMessage,
     });
+
     if (res?.status) {
-      navigate(ALL_NAVIGATION_LINKS.home.path);
+      setBookDetails(updatedBookData); // Update context with the new details
       togglePopupOpen(false);
+      navigate(ALL_NAVIGATION_LINKS.home.path);
     }
   };
 
-  const handleEditBook = () => {
+  const handleEditBook = (bookData) => {
+    setBookDetails(bookData);
     togglePopupOpen(true);
     setPopupType(ALL_POPUP_TYPES.form);
     setContent({
       title: "Update Book Details",
-      form: <AddUpdateForm handleSaveDetails={updateBookFun} />,
+      form: (
+        <AddUpdateForm
+          handleSaveDetails={(details) => updateBookFun(details)}
+        />
+      ),
     });
-    setBookDetails(bookDetails);
   };
 
   return (
@@ -121,11 +132,12 @@ const BookDetails = () => {
         <CardMedia
           component="img"
           image={STATIC_IMAGE_URL}
-          alt={`${bookDetails?.Title}`}
+          alt={`${bookData?.Title}`}
           sx={{
             maxWidth: 120,
             maxHeight: 120,
             alignSelf: "center",
+            mb: 2,
           }}
         />
         <Typography
@@ -134,7 +146,7 @@ const BookDetails = () => {
             fontWeight: "bold",
           }}
         >
-          {bookDetails?.Title}
+          {bookData?.Title}
         </Typography>
       </Box>
 
@@ -143,7 +155,7 @@ const BookDetails = () => {
           Author:
         </Typography>
 
-        <Typography>{bookDetails?.AuthorName}</Typography>
+        <Typography>{bookData?.AuthorName}</Typography>
       </Box>
 
       <Box>
@@ -151,7 +163,7 @@ const BookDetails = () => {
           Genre:
         </Typography>
 
-        <Typography>{bookDetails?.GenreName}</Typography>
+        <Typography>{bookData?.GenreName}</Typography>
       </Box>
 
       <Box>
@@ -159,7 +171,7 @@ const BookDetails = () => {
           Pages:
         </Typography>
 
-        <Typography>{bookDetails?.Pages}</Typography>
+        <Typography>{bookData?.Pages}</Typography>
       </Box>
 
       <Box>
@@ -167,7 +179,7 @@ const BookDetails = () => {
           Published Date:
         </Typography>
 
-        <Typography>{bookDetails?.PublishedDate}</Typography>
+        <Typography>{bookData?.PublishedDate}</Typography>
       </Box>
 
       <Box
@@ -176,11 +188,11 @@ const BookDetails = () => {
           marginTop: "auto",
         }}
       >
-        <IconButton color="primary" onClick={() => handleEditBook(bookDetails)}>
+        <IconButton color="primary" onClick={() => handleEditBook(bookData)}>
           <EditNoteIcon />
         </IconButton>
         <IconButton
-          onClick={() => handleDeleteBook(bookDetails?.BookID)}
+          onClick={() => handleDeleteBook(bookData?.BookID)}
           color="error"
         >
           <DeleteIcon />

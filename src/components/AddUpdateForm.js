@@ -1,12 +1,19 @@
-import { Box, TextField } from "@mui/material";
+import { Box, MenuItem, TextField } from "@mui/material";
 import { useContext, useState } from "react";
 import { ReusableButton, validateForm } from "../utils/utilConstants";
 import BookContext from "../context/BookContext";
 import PopupContext from "../context/PopupContext";
+import useGetData from "../hooks/useGetData";
+import { API_STATUS_LIST } from "../utils/constants";
+import SearchContext from "../context/SearchContext";
 
 const AddUpdateForm = ({ handleSaveDetails }) => {
   const { bookDetails, setBookDetails } = useContext(BookContext);
   const { togglePopupOpen } = useContext(PopupContext);
+  const { setSelectedAuthor, setSelectedGenre } = useContext(SearchContext);
+
+  const [apiStatus, setApiStatus] = useState(API_STATUS_LIST.initial);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [errors, setErrors] = useState({
     Title: "",
@@ -14,6 +21,11 @@ const AddUpdateForm = ({ handleSaveDetails }) => {
     GenreName: "",
     Pages: "",
     PublishedDate: "",
+  });
+
+  const [data, setData] = useState({
+    authors: [],
+    genres: [],
   });
 
   const handleChange = (name, value) => {
@@ -26,16 +38,28 @@ const AddUpdateForm = ({ handleSaveDetails }) => {
     } else if (value.trim() === "") {
       error = `${name} is required.`;
     }
-    setBookDetails((prev) => ({ ...prev, [name]: value }));
+
     setErrors((prev) => ({ ...prev, [name]: error }));
+    setBookDetails((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm({ bookDetails, setErrors })) {
-      handleSaveDetails(); //here iam passing the bookDetails
+      handleSaveDetails(bookDetails); //here iam passing the bookDetails
     }
   };
+
+  useGetData({
+    setApiStatus,
+    setData: (data) =>
+      setData({
+        authors: data?.authors,
+        genres: data?.genres,
+      }),
+    setErrorMessage,
+    isQuery: false,
+  });
 
   return (
     <Box
@@ -57,23 +81,43 @@ const AddUpdateForm = ({ handleSaveDetails }) => {
         helperText={errors.Title}
       />
       <TextField
-        variant="outlined"
-        value={bookDetails?.AuthorName}
-        onChange={(e) => handleChange("AuthorName", e.target.value)}
-        fullWidth
-        placeholder="Author Name"
-        error={!!errors.AuthorName}
-        helperText={errors.AuthorName}
-      />
-      <TextField
-        variant="outlined"
+        select
+        label="Genre"
         value={bookDetails?.GenreName}
         onChange={(e) => handleChange("GenreName", e.target.value)}
         fullWidth
-        placeholder="Genre Name"
+        variant="outlined"
+        sx={{
+          width: "100%",
+        }}
         error={!!errors.GenreName}
         helperText={errors.GenreName}
-      />
+      >
+        {data?.genres?.map((genre) => (
+          <MenuItem key={genre} value={genre}>
+            {genre}
+          </MenuItem>
+        ))}
+      </TextField>
+      <TextField
+        select
+        label="Author"
+        value={bookDetails?.AuthorName}
+        onChange={(e) => handleChange("AuthorName", e.target.value)}
+        fullWidth
+        variant="outlined"
+        sx={{
+          width: "100%",
+        }}
+        error={!!errors.AuthorName}
+        helperText={errors.AuthorName}
+      >
+        {data?.authors?.map((author) => (
+          <MenuItem key={author} value={author}>
+            {author}
+          </MenuItem>
+        ))}
+      </TextField>
       <TextField
         variant="outlined"
         value={bookDetails?.Pages}
@@ -93,6 +137,7 @@ const AddUpdateForm = ({ handleSaveDetails }) => {
         error={!!errors.PublishedDate}
         helperText={errors.PublishedDate}
       />
+
       <Box
         sx={{
           display: "flex",

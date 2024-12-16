@@ -14,7 +14,6 @@ import MobileNavigationLinks from "./MobileNavigationLinks";
 import PopupContext from "../context/PopupContext";
 import AddUpdateForm from "./AddUpdateForm";
 import { postRequest } from "../api/apiCalls";
-import BookContext from "../context/BookContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -22,16 +21,15 @@ const Navbar = () => {
     useContext(HamburgerContext);
   const { togglePopupOpen, setPopupType, setContent } =
     useContext(PopupContext);
-  const { bookDetails } = useContext(BookContext);
 
   const [apiStatus, setApiStatus] = useState(API_STATUS_LIST.initial);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const addBookFun = async (bookDetails) => {
+  const addBookFun = async (bookData) => {
     const res = await postRequest({
       setApiStatus,
       setErrorMessage,
-      requestData: bookDetails,
+      requestData: bookData,
     });
     if (res?.status) {
       navigate(ALL_NAVIGATION_LINKS.home.path);
@@ -44,7 +42,9 @@ const Navbar = () => {
     setPopupType(ALL_POPUP_TYPES.form);
     setContent({
       title: "Add Book Details",
-      form: <AddUpdateForm handleSaveDetails={() => addBookFun(bookDetails)} />,
+      form: (
+        <AddUpdateForm handleSaveDetails={(bookData) => addBookFun(bookData)} />
+      ),
     });
   };
 

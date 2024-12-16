@@ -42,6 +42,7 @@ const EachBook = ({ bookData }) => {
             maxWidth: 120,
             maxHeight: 120,
             alignSelf: "center",
+            mb: 2,
           }}
         />
 

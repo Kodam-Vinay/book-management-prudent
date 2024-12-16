@@ -9,6 +9,8 @@ export const BookProvider = ({ children }) => {
     GenreName: "",
     Pages: "",
     PublishedDate: "",
+    AuthorID: "",
+    GenreID: "",
   });
 
   return (
@@ -17,4 +19,5 @@ export const BookProvider = ({ children }) => {
     </BookContext.Provider>
   );
 };
+
 export default BookContext;
